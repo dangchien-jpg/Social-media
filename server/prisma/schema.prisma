@@ -1,0 +1,98 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id         Int            @id @default(autoincrement())
+  username   String         @db.VarChar(45)
+  email      String         @unique(map: "email") @db.VarChar(200)
+  password   String         @db.VarChar(200)
+  name       String         @db.VarChar(100)
+  coverPic   String?        @db.VarChar(255)
+  profilePic String?        @db.VarChar(255)
+  city       String?        @db.VarChar(45)
+  website    String?        @db.VarChar(100)
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+  comments   Comment[]
+  likes      Like[]
+  posts      Post[]
+  followers  Relationship[] @relation("Followed")
+  following  Relationship[] @relation("Follower")
+  stories    Story[]
+
+  @@map("users")
+}
+
+model Post {
+  id          Int       @id @default(autoincrement())
+  description String?   @db.VarChar(255)
+  img         String?   @db.VarChar(255)
+  userId      Int
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  comments    Comment[]
+  likes       Like[]
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade, map: "fk_posts_users")
+
+  @@index([userId], map: "fk_posts_users")
+  @@map("posts")
+}
+
+model Comment {
+  id       Int      @id @default(autoincrement())
+  desc     String?  @db.VarChar(255)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  userId   Int
+  postId   Int
+  post     Post     @relation(fields: [postId], references: [id], onDelete: Cascade, map: "fk_comments_posts")
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade, map: "fk_comments_users")
+
+  @@index([postId], map: "fk_comments_posts")
+  @@index([userId], map: "fk_comments_users")
+  @@map("comments")
+}
+
+model Like {
+  id       Int      @id @default(autoincrement())
+  userId   Int
+  postId   Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  post     Post     @relation(fields: [postId], references: [id], onDelete: Cascade, map: "fk_likes_posts")
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade, map: "fk_likes_users")
+
+  @@index([postId], map: "fk_likes_posts")
+  @@index([userId], map: "fk_likes_users")
+  @@map("likes")
+}
+
+model Story {
+  id       Int      @id @default(autoincrement())
+  img      String?  @db.VarChar(255)
+  userId   Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade, map: "fk_stories_users")
+
+  @@index([userId], map: "fk_stories_users")
+  @@map("stories")
+}
+
+model Relationship {
+  id             Int  @id @default(autoincrement())
+  followerUserId Int
+  followedUserId Int
+  followed       User @relation("Followed", fields: [followedUserId], references: [id], onDelete: Cascade, map: "fk_followedUserId_users")
+  follower       User @relation("Follower", fields: [followerUserId], references: [id], onDelete: Cascade, map: "fk_followerUserId_users")
+
+  @@index([followedUserId], map: "fk_followedUserId_users")
+  @@index([followerUserId], map: "fk_followerUserId_users")
+  @@map("relationships")
+}
