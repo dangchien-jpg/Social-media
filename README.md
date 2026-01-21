@@ -39,8 +39,15 @@ This project focuses on backend logic, RESTful APIs, and database design, combin
 
 ---
 
-## ⚙️ Installation & Run
 
+## 🔐 Environment Variables
+Create a `.env` file in the `server` directory and configure the following variables:
+```env
+PORT=5000
+DATABASE_URL=your_database_url
+JWT_SECRET=your_jwt_secret
+```
+## ⚙️ Installation & Run
 ### Backend
 ```bash
 cd server
