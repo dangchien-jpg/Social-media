@@ -46,9 +46,7 @@ This project focuses on backend logic, RESTful APIs, and database design, combin
 cd server
 npm install
 npm start
-
-### Frontend
-```md
+```
 ### Frontend
 ```bash
 cd client
